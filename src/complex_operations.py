@@ -1,62 +1,83 @@
-import cmath  # Para funções matemáticas complexas (como phase/argumento)
-import math   # Para funções matemáticas reais (como pi, cos, sin)
+import cmath  # Para funções complexas como phase (argumento)
+import math   # Para funções reais como pi e cos/sin
 
-class ComplexOperations:
+# --- Funções Aritméticas Básicas (Chamadas pelo expression_handler) ---
+
+def soma(z1: complex, z2: complex) -> complex:
+    """Implementa z1 + z2."""
+    return z1 + z2
+
+def subtracao(z1: complex, z2: complex) -> complex:
+    """Implementa z1 - z2."""
+    return z1 - z2
+
+def multiplicacao(z1: complex, z2: complex) -> complex:
+    """Implementa z1 * z2."""
+    return z1 * z2
+
+def divisao(z1: complex, z2: complex) -> complex:
+    """Implementa z1 / z2 (Regra 1)."""
+    if z2 == 0:
+        # Detecta e rejeita a divisão por zero (Regra 5)
+        raise ZeroDivisionError("Divisão por zero não permitida.")
+    return z1 / z2
+
+def potencia(z: complex, n: complex) -> complex:
+    """Implementa z ** n (Regra 1)."""
+    return z ** n
+
+def conjugado(z: complex) -> complex:
     """
-    Implementa as operações de números complexos necessárias para a calculadora,
-    especialmente aquelas não trivialmente tratadas pelos operadores nativos do Python.
+    Calcula o conjugado de z. (a - bi) (Regra 1)
     """
+    return z.conjugate()
 
-    @staticmethod
-    def get_conjugate(z: complex) -> complex:
-        """
-        Calcula o conjugado do número complexo z. (a - bi)
-        Regra 1: Conjugado
-        """
-        # O método .conjugate() é nativo do tipo complex do Python
-        return z.conjugate()
+def raiz(z: complex, n: complex) -> complex or list[complex]:
+    """
+    Calcula as raízes n-ésimas de z (Regra 1).
+    Retorna a primeira raiz (k=0) como resultado da expressão.
+    """
+    # Se o índice da raiz (n) não for um número real positivo (>= 1), trata como potência
+    if n.imag != 0 or n.real < 1 or n.real != int(n.real):
+        return z ** (1/n)
+    
+    n_int = int(n.real)
+    
+    if n_int == 0:
+        raise ValueError("O índice da raiz não pode ser zero.")
+        
+    r = abs(z)  # Módulo (r)
+    theta = cmath.phase(z)  # Argumento (theta)
+    
+    # Cálculo apenas da primeira raiz (k=0) para a execução da expressão:
+    angle = theta / n_int
+    modulus_root = r ** (1/n_int)
+    
+    return complex(
+        modulus_root * math.cos(angle),
+        modulus_root * math.sin(angle)
+    )
 
-    @staticmethod
-    def get_root(z: complex, n: int) -> list[complex]:
-        """
-        Calcula as n raízes de um número complexo (Raiz n).
-        Regra 1: Raiz
-        
-        Utiliza a fórmula de De Moivre para raízes:
-        wk = r^(1/n) * [cos((theta + 2*pi*k)/n) + i * sin((theta + 2*pi*k)/n)], 
-        onde k varia de 0 até n-1.
-        """
-        if n == 0:
-            raise ValueError("O índice da raiz (n) não pode ser zero.")
-        if n < 1:
-            raise ValueError("A função de raiz deve receber n >= 1.")
-            
-        r = abs(z)  # Módulo (r)
-        theta = cmath.phase(z)  # Argumento (theta)
-        roots = []
-        
-        # Iteração para encontrar as n raízes
-        for k in range(n):
-            angle = (theta + 2 * math.pi * k) / n
-            modulus_root = r ** (1/n)
-            
-            # Converte de volta para a forma retangular
-            root_k = complex(
-                modulus_root * math.cos(angle),
-                modulus_root * math.sin(angle)
-            )
-            roots.append(root_k)
-            
-        return roots
+# --- Função de Formatação (Chamada pelo expression_handler e main) ---
+
+def formatar(z: complex or float) -> str:
+    """
+    Formata o número complexo (Regra 0).
+    Garante que 'j' (interno) seja exibido como 'i' (externo) no formato (a+bi).
+    """
+    z = complex(z)
+    real_part = z.real
+    imag_part = z.imag
     
-# Exemplo de teste da classe
-if __name__ == "__main__":
-    z = complex(8, 0) # Exemplo: 8 + 0i
-    n_roots = 3
+    # Arredondamento para evitar problemas de precisão
+    real_part = round(real_part, 8)
+    imag_part = round(imag_part, 8)
     
-    print(f"Conjugado de {z}: {ComplexOperations.get_conjugate(z)}")
+    if imag_part == 0:
+        return f"({real_part})"
+    if real_part == 0:
+        return f"({imag_part}i)"
     
-    raizes = ComplexOperations.get_root(z, n_roots)
-    print(f"\nAs {n_roots} raízes de {z}:")
-    for i, root in enumerate(raizes):
-        print(f"Raiz {i+1}: {root.real:.4f} + {root.imag:.4f}i")
+    op = '+' if imag_part > 0 else ''
+    
+    return f"({real_part}{op}{imag_part}i)"
