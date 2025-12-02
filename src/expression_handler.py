@@ -16,6 +16,9 @@ PRECEDENCIA = {'+': 1, '-': 1, '*': 2, '/': 2, '**': 3}
 REGEX_VARIAVEL = re.compile(r'\b[a-hj-z]\b(?![a-z0-9_])')
 
 def parse_literal(token):
+    if isinstance(token, (complex, float, int)):
+        return token
+        
     token = token.strip().replace('i', 'j')
     try:
         return complex(token)
@@ -25,25 +28,32 @@ def parse_literal(token):
 def tokenize(expressao):
     tokens = re.findall(r"raiz|conjugado|\*\*|[\+\-\*/\(\)]|[a-hj-z0-9\.]*i|[a-hj-z0-9\.]+|[a-hj-z]", expressao.replace(' ', ''))
     
-    clean = []
-    i = 0
+    clean=[]
+    i=0
     while i < len(tokens):
-        t = tokens[i]
+        t=tokens[i]
         
         if t == '-':
-            if i == 0 or tokens[i-1] in '(*+/-':
-                if i + 1 < len(tokens):
-                    n = parse_literal(tokens[i+1])
-                    if not isinstance(n, str):
-                        clean.append(complex(0) - n)
-                        i += 2
-                        continue
-        if t == '+' and (i == 0 or tokens[i-1] in '(*+/-'):
-            i += 1
-            continue
+            is_unary=False
+            
+            if i==0:
+                is_unary=True
+            elif clean:
+                last = clean[-1]
+                if isinstance(last, str) and last in '(*+/-': 
+                    is_unary=True
+            
+            if is_unary and i + 1 < len(tokens):
+                next_t=tokens[i+1]
+                n=parse_literal(next_t)
+                if not isinstance(n, str): 
+                    clean.append(complex(0) - n) 
+                    i += 2 
+                    continue
         
         clean.append(t)
         i += 1
+        
     return clean
 
 def parse_expression(tokens):
