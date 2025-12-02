@@ -23,7 +23,7 @@ def parse_literal(token):
         return token
 
 def tokenize(expressao):
-    tokens = re.findall(r"raiz|conjugado|[\+\-\*/\(\)]|\*\*|[a-hj-z0-9\.]*i|[a-hj-z0-9\.]+|[a-hj-z]", expressao.replace(' ', ''))
+    tokens = re.findall(r"raiz|conjugado|\*\*|[\+\-\*/\(\)]|[a-hj-z0-9\.]*i|[a-hj-z0-9\.]+|[a-hj-z]", expressao.replace(' ', ''))
     
     clean = []
     i = 0
