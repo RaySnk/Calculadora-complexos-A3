@@ -4,9 +4,6 @@
 
 Este projeto implementa uma calculadora científica completa para números complexos em **Python 3.x** (Regra 9). A interface é em linha de comando (Regra 10) e o sistema utiliza uma **Árvore Sintática Abstrata (AST) em notação LISP** para avaliar expressões (Regra 6).
 
-O código-fonte completo está disponível neste repositório:
-**Link do GITHUB:** `https://github.com/RaySnk/Calculadora-complexos-A3/`
-
 ## 👥 Membros da Equipe e Responsabilidades
 
 A entrega é feita através deste repositório, constando as informações de identificação (Regra 11).
