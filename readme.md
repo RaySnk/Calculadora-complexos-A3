@@ -1,63 +1,53 @@
-# CALCULADORA CIENTÍFICA DE NÚMEROS COMPLEXOS (A3)
+# CALCULADORA CIENTÍFICA DE NÚMEROS COMPLEXOS (TRABALHO A3)
 
-## 📌 Introdução e Requisitos
+## 📌 Sobre o Projeto
 
-Este projeto implementa uma calculadora científica completa para números complexos em **Python 3.x** (Regra 9). A interface é em linha de comando (Regra 10) e o sistema utiliza uma **Árvore Sintática Abstrata (AST) em notação LISP** para avaliar expressões (Regra 6).
+Este projeto consiste em uma calculadora científica desenvolvida em **Python 3.x** capaz de processar números complexos. A aplicação roda via linha de comando e se destaca por não apenas calcular operações simples, mas interpretar expressões matemáticas completas.
 
-## 👥 Membros da Equipe e Responsabilidades
+Para isso, o sistema utiliza uma **Árvore Sintática Abstrata (AST)**. Isso significa que ele lê a expressão, entende a precedência dos operadores (ex: multiplicação antes de soma) e exibe a estrutura de execução em notação LISP antes de mostrar o resultado final.
 
-A entrega é feita através deste repositório, constando as informações de identificação (Regra 11).
+## 👥 Desenvolvedores
+
+Abaixo, a identificação dos membros da equipe e a divisão das responsabilidades no desenvolvimento do código.
 
 | Membro | RA | Módulo Principal de Responsabilidade |
 | :--- | :--- | :--- |
-| **[Duilio do nascimento brandao ]** | [12724216242] | **Função 1:** Operações com Complexos (`complex_operations.py`) |
-| **[Alisson nonato de lima conceição]** | [12724216237] | **Função 2:** Expressões e Variáveis (`expression_handler.py`) |
-| **[Edinaldo andrade da silva]** | [12724146825] | **Função 3:** Interface e Árvore (`main.py`) |
-| **[Raimundo Neto]** | [12724119913] | Documentação e GitHub (Relatório e Organização Final) |
+| **Duilio do Nascimento Brandao** | 12724216242 | **Backend Matemático:** Operações com Complexos (`complex_operations.py`) |
+| **Alisson Nonato de Lima Conceição** | 12724216237 | **Interpretador:** Expressões e Variáveis (`expression_handler.py`) |
+| **Edinaldo Andrade da Silva** | 12724146825 | **Frontend/Integração:** Interface e Árvore (`main.py`) |
+| **Raimundo Neto** | 12724119913 | **Documentação:** Relatório Técnico e Organização do GitHub |
 
 ---
 
-## 🛠️ Detalhamento da Implementação do Código (Relatório Técnico)
+## 🛠️ Relatório Técnico (Detalhamento da Implementação)
 
-### 1. Módulo de Operações Aritméticas (`src/complex_operations.py`)
+O sistema foi arquitetado em três módulos principais para garantir a organização e a escalabilidade do código.
 
-Este módulo atende integralmente à **Regra 1** (Aritmética) e à **Regra 0** (Representação).
+### 1. Módulo de Operações (`src/complex_operations.py`)
+Este arquivo é o "motor" matemático do projeto. Ele isola a lógica de cálculo da lógica de texto.
+* **Operações:** Implementa as funções básicas (soma, subtração, multiplicação, divisão, potência) e avançadas (raiz e conjugado) utilizando a biblioteca nativa do Python.
+* **Formatação Visual:** Inclui uma função dedicada a formatar a saída para o padrão matemático `a + bi`, substituindo o `j` (padrão do Python) por `i` e ocultando partes nulas para uma visualização mais limpa.
+* **Tratamento de Erros:** Previne falhas críticas, como a divisão por zero, lançando exceções controladas.
 
-* **Aritmética Base:** As funções (`soma`, `subtracao`, `multiplicacao`, etc.) são *wrappers* que utilizam o tipo `complex` nativo do Python, garantindo a manipulação precisa das partes real e imaginária.
-* **Formatação (`formatar`):** Esta função customizada garante que a saída esteja sempre no formato **`(a + bi)`** ou **`(a - bi)`** (Regra 0), omitindo termos nulos e simplificando a representação.
-* **Detecção de Erro:** A função `divisao` inclui uma verificação de `z2 == 0` para levantar a exceção `ZeroDivisionError` (Regra 5).
+### 2. Módulo do Interpretador (`src/expression_handler.py`)
+É o núcleo inteligente do sistema. Ele é responsável por ler o texto digitado pelo usuário e transformá-lo em instruções que o computador entende.
+* **Tokenização e Parsing:** O código quebra a string de entrada e constrói a Árvore Sintática (AST), garantindo que a ordem das operações matemáticas seja respeitada (precedência).
+* **Notação LISP:** Conforme os requisitos, o sistema converte a árvore interna para uma representação visual em LISP (ex: `(+ 2 3)`), que é exibida no terminal.
+* **Variáveis:** O interpretador identifica quando o usuário digita letras (variáveis), pausa a execução e solicita os valores correspondentes em tempo de execução.
 
-### 2. Módulo de Expressões e Variáveis (`src/expression_handler.py`)
-
-Este é o núcleo da lógica, responsável pela AST, variáveis e execução (Regras 2, 4, 6 e 7).
-
-#### A. Parsing e AST (Regras 2 e 6)
-
-* **Processamento da Expressão:** O módulo utiliza o *parsing* para construir a AST respeitando a precedência dos operadores (Regra 2).
-* **Notação LISP:** A AST é internamente uma lista aninhada. A função **`format_lisp_output`** converte essa estrutura para a notação **(operador argumento1 argumento2...)** exigida, que é exibida no console antes do cálculo (Regra 6 e 10).
-
-#### B. Execução e Variáveis (Regras 4 e 7)
-
-* **Execução Recursiva:** A função **`executar_arvore`** executa a AST de forma recursiva (pós-ordem), garantindo que os cálculos ocorram na ordem correta, chamando as funções de `complex_operations.py` (Regra 4).
-* **Variáveis:** O sistema identifica variáveis e, através da função `resolver_expressao`, solicita o valor ao usuário em tempo de execução, tratando-o como um complexo válido (Regra 7).
-
-#### C. Teste de Igualdade (Regra 3)
-
-* A função **`checar_igualdade`** avalia as duas expressões separadamente através da AST. Os resultados são comparados numericamente com uma pequena margem de tolerância para garantir a veracidade da igualdade (Regra 3).
-
-### 3. Módulo de Interface e Execução (`src/main.py`)
-
-* **Ponto de Entrada:** É o *script* principal que inicia o programa.
-* **Interface:** Implementa o loop de linha de comando para entrada de expressões (Regra 10).
-* **Integração:** Inicia os testes de igualdade (Regra 3) e chama a função principal de resolução para processar a entrada do usuário.
+### 3. Interface Principal (`src/main.py`)
+É o ponto de entrada da aplicação.
+* **Verificação Automática:** Ao iniciar, o script executa testes automáticos de igualdade para validar a lógica de comparação do sistema.
+* **Loop de Execução:** Mantém a aplicação rodando em um loop contínuo, recebendo as expressões do usuário e enviando para o interpretador processar, até que o comando de saída seja acionado.
 
 ---
 
-## 🚀 Instruções Finais de Execução
+## 🚀 Como Executar
 
-1.  **Baixar o Repositório:** Obtenha os arquivos (clonando ou baixando o ZIP).
-2.  **Execute o Arquivo Principal:** No terminal, navegue até a pasta raiz do projeto e execute:
+1.  **Baixe o Projeto:** Faça o clone deste repositório ou o download do arquivo ZIP.
+2.  **Abra o Terminal:** Navegue até a pasta raiz do projeto.
+3.  **Execute o Comando:**
     ```bash
     python src/main.py
     ```
-A aplicação iniciará, executará os testes e aguardará a entrada de expressões.
+O programa iniciará automaticamente, exibirá os testes de verificação e ficará aguardando a entrada da sua expressão.
